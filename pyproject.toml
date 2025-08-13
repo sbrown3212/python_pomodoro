@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-pomodoro = "python_pomodoro:cli.cli"
+pmdro = "python_pomodoro:cli.cli"
 
 [build-system]
 requires = ["uv_build>=0.8.5,<0.9.0"]
