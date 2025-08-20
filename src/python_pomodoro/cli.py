@@ -27,7 +27,7 @@ def resume():
 
 
 @cli.command("cancel")
-def stop():
+def cancel():
     click.echo("Canceling timer. (not yet implemented)")
 
 

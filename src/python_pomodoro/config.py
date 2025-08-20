@@ -10,6 +10,24 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
+# TODO: consider adding validation values (e.g. min and max, data types?)
+CONFIG_SCHEMA = {
+    "focus_duration": {
+        "default": 25,
+        "comment": "Focus session duration in minutes (int)",
+    },
+    "break_duration": {"default": 5, "comment": "Break duration in minutes (int)"},
+    "auto_start_break": {
+        "default": True,
+        "comment": "Automatically start break when focus ends (bool)",
+    },
+    "auto_start_focus": {
+        "default": False,
+        "comment": "Automatically start focus when break ends (bool)",
+    },
+}
+
+
 def get_config_path():
     return Path.home() / ".config" / "pmdro" / "config.toml"
 
@@ -32,15 +50,14 @@ def load_config_file():
 
 
 def get_defaults():
-    # Reminder: update 'validate_config' when updating default config values.
-    return {
-        "focus_duration": 25,
-        "break_duration": 5,
-        "auto_start_break": True,
-        "auto_start_focus": False,
-    }
+    defaults = {}
+    for key, value in CONFIG_SCHEMA.items():
+        defaults[key] = value["default"]
+
+    return defaults
 
 
+# TODO: change validation to be based on schema values.
 def validate_config(config):
     max_timer = 180
 
@@ -64,4 +81,5 @@ def get_effective_config():
 
 
 if __name__ == "__main__":
+    print(get_defaults())
     print(get_effective_config())
