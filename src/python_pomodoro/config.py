@@ -10,12 +10,6 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-# TODO: consider adding validation values (e.g. min and max, data types?)
-# Validation types:
-# - type
-# - min
-# - max
-#
 CONFIG_SCHEMA = {
     "focus_duration": {
         "default": 25,
@@ -84,24 +78,11 @@ def get_defaults():
     return defaults
 
 
-# TODO: change validation to be based on schema values.
 def validate_config(config):
-    # max_timer = 180
-    #
-    # if config.get("focus_duration", 0) <= 0 or config.get("focus_duration") > max_timer:
-    #     config["focus_duration"] = 25
-    # if config.get("break_duration", 0) <= 0 or config.get("break_duration") > max_timer:
-    #     config["break_duration"] = 5
-    # if not isinstance(config.get("auto_start_break"), bool):
-    #     config["auto_start_break"] = True
-    # if not isinstance(config.get("auto_start_focus"), bool):
-    #     config["auto_start_focus"] = False
-    #
-    # return config
+    validated_config = {}
     for schema_key, schema_item in CONFIG_SCHEMA.items():
         if schema_key in config:
             value = config[schema_key]
-
             rules = CONFIG_SCHEMA[schema_key]["validation"]
 
             expected_type = rules["type"]
@@ -109,29 +90,30 @@ def validate_config(config):
                 logger.warning(
                     f"Config key '{schema_key}' is not of type '{rules['type'].__name__}'. Using default."
                 )
-                config[schema_key] = schema_item["default"]
+                validated_config[schema_key] = schema_item["default"]
                 continue
 
             if "min" in rules and value < rules["min"]:
                 logger.warning(
                     f"Config key '{schema_key}' is below the minimum value of {rules['min']}. Using default."
                 )
-                config[schema_key] = schema_item["default"]
-
-            if "max" in rules and value > rules["max"]:
+                validated_config[schema_key] = schema_item["default"]
+            elif "max" in rules and value > rules["max"]:
                 logger.warning(
                     f"Config key '{schema_key}' is above the maximum value of {rules['max']}. Using default."
                 )
-                config[schema_key] = schema_item["default"]
+                validated_config[schema_key] = schema_item["default"]
+
+            validated_config[schema_key] = schema_item["default"]
 
         else:
-            config[schema_key] = schema_item["default"]
+            validated_config[schema_key] = schema_item["default"]
 
     for key in config:
         if key not in CONFIG_SCHEMA:
             logger.warning(f"Unknown key '{key}' in config. Ignoring value.")
 
-    return config
+    return validated_config
 
 
 def get_effective_config():
@@ -142,5 +124,5 @@ def get_effective_config():
 
 
 if __name__ == "__main__":
-    print(get_defaults())
-    print(get_effective_config())
+    print(f"App defaults: {get_defaults()}")
+    print(f"Validated config: {get_effective_config()}")
