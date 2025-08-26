@@ -123,6 +123,38 @@ def get_effective_config():
     return validate_config(merged)
 
 
+def _format_toml_value(value):
+    if isinstance(value, bool):
+        return str(value).lower()
+    elif isinstance(value, (int, float)):
+        return str(value)
+    elif isinstance(value, str):
+        return f'"{value}"'
+    else:
+        logger.warning(
+            f"Unknown type for TOML formatting: {type(value)}. Using string representation."
+        )
+        return str(value)
+
+
+def create_config_template():
+    lines = []
+
+    header_comment = "PMDRO - Command Line Pomodor Timer"
+    lines.append(f"# {header_comment}\n")
+
+    for key, schema_item in CONFIG_SCHEMA.items():
+        comment = schema_item["comment"]
+        default_value = schema_item["default"]
+
+        lines.append(f"# {comment}")
+        lines.append(f"{key} = {_format_toml_value(default_value)}\n")
+
+    return "\n".join(lines)
+
+
 if __name__ == "__main__":
-    print(f"App defaults: {get_defaults()}")
-    print(f"Validated config: {get_effective_config()}")
+    # print(f"App defaults: {get_defaults()}")
+    # print(f"Validated config: {get_effective_config()}")
+    print("CONFIG TEMPLATE:")
+    print(create_config_template())
