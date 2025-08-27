@@ -36,6 +36,15 @@ def status():
     click.echo("Getting timer status. (not yet implemented)")
 
 
-@cli.command("config")
+# ----- Config Group -----
+@cli.group("config")
 def config():
+    """Manage pmdro configuration"""
     click.echo("Setting config. (not yet implemented)")
+
+
+@config.command("init")
+@click.option("--force", is_flag=True, help="Overwrite existing config file")
+def init(force):
+    """Create a new config file with defaults"""
+    pass
