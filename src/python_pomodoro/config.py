@@ -140,7 +140,7 @@ def _format_toml_value(value):
 def create_config_template():
     lines = []
 
-    header_comment = "PMDRO - Command Line Pomodor Timer"
+    header_comment = "PMDRO - Command Line Pomodoro Timer"
     lines.append(f"# {header_comment}\n")
 
     for key, schema_item in CONFIG_SCHEMA.items():
