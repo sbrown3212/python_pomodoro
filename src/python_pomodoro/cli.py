@@ -43,6 +43,7 @@ def status():
 @cli.group("config")
 def config():
     """Manage pmdro configuration"""
+    pass
 
 
 @config.command("init")
@@ -70,6 +71,7 @@ def init(force):
         config_path.parent.mkdir(parents=True, exist_ok=True)
     except OSError as e:
         click.echo(f"Error: Failed to create parent directory: {e}", err=True)
+        raise click.Abort()
 
     # Write config template contents to 'config_path'.
     try:
@@ -78,6 +80,7 @@ def init(force):
         click.echo(
             f"Error: Failed to write default config to {config_path}: {e}", err=True
         )
+        raise click.Abort()
 
     # Provide 'success' feedback.
     click.echo(f"Successfully initialized config file at '{config_path}'")
