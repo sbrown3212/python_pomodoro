@@ -1,9 +1,12 @@
 import click
 
+from python_pomodoro.config import get_config_path, create_config_template
+
 
 @click.group()
 def cli():
-    click.echo("Welcome to Python Pomodoro.")
+    # click.echo("Welcome to Python Pomodoro.")
+    pass
 
 
 @cli.command("start")
@@ -40,11 +43,41 @@ def status():
 @cli.group("config")
 def config():
     """Manage pmdro configuration"""
-    click.echo("Setting config. (not yet implemented)")
 
 
 @config.command("init")
 @click.option("--force", is_flag=True, help="Overwrite existing config file")
 def init(force):
     """Create a new config file with defaults"""
-    pass
+
+    # Get config path.
+    config_path = get_config_path()
+
+    # Handle if file already exists and '--force' is not used.
+    if config_path.exists() and not force:
+        click.echo("Error: Config file already exists", err=True)
+        click.echo(f"Location: {config_path}")
+        click.echo(
+            "Use '--force' option to overwite config to defaults, or edit file directly."
+        )
+        raise click.Abort()
+
+    # Create contents of default config template.
+    template_content = create_config_template()
+
+    # Create parent directories if they don't already exist.
+    try:
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        click.echo(f"Error: Failed to create parent directory: {e}", err=True)
+
+    # Write config template contents to 'config_path'.
+    try:
+        config_path.write_text(template_content)
+    except OSError as e:
+        click.echo(
+            f"Error: Failed to write default config to {config_path}: {e}", err=True
+        )
+
+    # Provide 'success' feedback.
+    click.echo(f"Successfully initialized config file at '{config_path}'")
