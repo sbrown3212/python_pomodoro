@@ -104,7 +104,7 @@ def validate_config(config):
                 )
                 validated_config[schema_key] = schema_item["default"]
 
-            validated_config[schema_key] = schema_item["default"]
+            validated_config[schema_key] = value
 
         else:
             validated_config[schema_key] = schema_item["default"]
