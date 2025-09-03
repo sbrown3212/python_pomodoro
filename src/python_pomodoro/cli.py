@@ -99,8 +99,10 @@ def show():
 
     if config_path.exists():
         click.echo(f"Config file: {config_path}")
+        click.echo("To edit: open this file in your preferred editor.")
     else:
         click.echo(f"Config file: {config_path} (not found, using defaults instead)")
+        click.echo("To create config file: run the 'pmdro config init' command.")
 
     click.echo()
 
