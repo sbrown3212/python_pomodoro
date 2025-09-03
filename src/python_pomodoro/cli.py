@@ -1,6 +1,11 @@
 import click
 
-from python_pomodoro.config import get_config_path, create_config_template
+from python_pomodoro.config import (
+    CONFIG_SCHEMA,
+    get_config_path,
+    create_config_template,
+    get_effective_config,
+)
 
 
 @click.group()
@@ -84,3 +89,24 @@ def init(force):
 
     # Provide 'success' feedback.
     click.echo(f"Successfully initialized config file at '{config_path}'")
+
+
+@config.command("show")
+def show():
+    """Display current effective configuration"""
+
+    config_path = get_config_path()
+
+    if config_path.exists():
+        click.echo(f"Config file: {config_path}")
+    else:
+        click.echo(f"Config file: {config_path} (not found, using defaults instead)")
+
+    click.echo()
+
+    effective_config = get_effective_config()
+
+    click.echo("Current configuration:")
+    for key, value in effective_config.items():
+        comment = CONFIG_SCHEMA[key]["comment"]
+        click.echo(f"  {key} = {value}  # {comment}")
