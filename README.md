@@ -11,3 +11,16 @@ Used `uv` to manage dependencies and the virtual environment.
 Created the project using `uv init --package python_pomodoro`
 The `--package`` flag creates a `src` and a module directory, an `__init__.py` in the module directory, adds a build system, and creates a command(?).
 -->
+
+<!--
+Things to write about:
+- config schema organization and validation
+- nohup and & vs daemon
+- race conditions (atomic writes vs file locking)
+-->
+
+<!--
+Future goals:
+- handle race conditions (atomic writes vs file locking)
+- implement daemon (with automatic restart and logging/error handling)
+-->
