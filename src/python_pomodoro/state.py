@@ -87,6 +87,12 @@ class Timer:
         elif not allow_zero and current_int <= 0:
             raise ValueError(f"Invalid {field_name}: value must be greater than zero.")
 
+    def _require_field(self, field_name: str):
+        current_value = getattr(self, field_name)
+
+        if current_value is None:
+            raise ValueError(f"{field_name} is required for {self.status.value} state.")
+
 
 def get_state_path():
     pass
