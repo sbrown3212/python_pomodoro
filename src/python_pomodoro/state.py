@@ -60,6 +60,9 @@ class Timer:
         if timestamp is None:
             return
 
+        if not isinstance(timestamp, int):
+            raise ValueError(f"Invalid {field_name}: timestamp must be of type 'int'.")
+
         current_time = int(time.time())
         if timestamp >= current_time:
             raise ValueError(f"Invalid {field_name}: timestamp is in the future.")
@@ -67,6 +70,22 @@ class Timer:
             raise ValueError(
                 f"Invalid {field_name}: timestamp is more than 24 hours old."
             )
+
+    def _validate_non_negative_int(self, field_name: str, allow_zero: bool):
+        current_int = getattr(self, field_name)
+
+        if current_int is None:
+            return
+
+        if not isinstance(current_int, int):
+            raise ValueError(f"Invalid {field_name}: value must be of type 'int'.")
+
+        if allow_zero and current_int < 0:
+            raise ValueError(
+                f"Invalid {field_name}: value must be greater than or equal to zero."
+            )
+        elif not allow_zero and current_int <= 0:
+            raise ValueError(f"Invalid {field_name}: value must be greater than zero.")
 
 
 def get_state_path():
