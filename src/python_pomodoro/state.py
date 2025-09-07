@@ -1,5 +1,5 @@
-import enum
 import logging
+import time
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
@@ -54,6 +54,19 @@ class Timer:
         logger.warning(
             f"Auto-cleaned '{field_name}' from '{current_value}' to '{target_value}'."
         )
+
+    def _validate_timestamp(self, field_name: str):
+        timestamp = getattr(self, field_name)
+        if timestamp is None:
+            return
+
+        current_time = int(time.time())
+        if timestamp >= current_time:
+            raise ValueError(f"Invalid {field_name}: timestamp is in the future.")
+        elif current_time - timestamp > 86400:
+            raise ValueError(
+                f"Invalid {field_name}: timestamp is more than 24 hours old."
+            )
 
 
 def get_state_path():
