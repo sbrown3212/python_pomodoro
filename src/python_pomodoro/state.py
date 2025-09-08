@@ -20,6 +20,47 @@ class SessionType(Enum):
     BREAK = "break"
 
 
+# Should I make a 'timestamp' type definition?
+
+STATE_SCHEMA = {
+    "status": {
+        "type": TimerStatus,
+        "required_for": {
+            TimerStatus.IDLE,
+            TimerStatus.RUNNING,
+            TimerStatus.PAUSED,
+            TimerStatus.COMPLETED,
+        },
+    },
+    "session_type": {
+        "type": SessionType,
+        "required_for": {
+            TimerStatus.RUNNING,
+            TimerStatus.PAUSED,
+            TimerStatus.COMPLETED,
+        },
+    },
+    "start_time": {
+        "type": "timestamp",  # Create a timestamp data type?
+        "required_for": {
+            TimerStatus.RUNNING,
+            TimerStatus.PAUSED,
+            TimerStatus.COMPLETED,
+        },
+    },
+    "duration_minutes": {
+        "type": int,
+        "required_for": {
+            TimerStatus.RUNNING,
+            TimerStatus.PAUSED,
+            TimerStatus.COMPLETED,
+        },
+    },
+    "pause_time": {"type": "timestamp", "required_for": {TimerStatus.PAUSED}},
+    "total_paused_seconds": {"type": int, "required_for": {TimerStatus.PAUSED}},
+}
+
+
 @dataclass
 class Timer:
     status: TimerStatus
@@ -92,6 +133,9 @@ class Timer:
 
         if current_value is None:
             raise ValueError(f"{field_name} is required for {self.status.value} state.")
+
+    def _clear_field(self, field_name: str):
+        current_value = getattr(self, field_name)
 
 
 def get_state_path():
