@@ -39,14 +39,16 @@ STATE_SCHEMA = {
             TimerStatus.PAUSED,
             TimerStatus.COMPLETED,
         },
+        "cleared_value": None,
     },
     "start_time": {
-        "type": "timestamp",  # Create a timestamp data type?
+        "type": int,
         "required_for": {
             TimerStatus.RUNNING,
             TimerStatus.PAUSED,
             TimerStatus.COMPLETED,
         },
+        "cleared_value": None,
     },
     "duration_minutes": {
         "type": int,
@@ -55,9 +57,18 @@ STATE_SCHEMA = {
             TimerStatus.PAUSED,
             TimerStatus.COMPLETED,
         },
+        "cleared_value": 0,
     },
-    "pause_time": {"type": "timestamp", "required_for": {TimerStatus.PAUSED}},
-    "total_paused_seconds": {"type": int, "required_for": {TimerStatus.PAUSED}},
+    "pause_time": {
+        "type": int,
+        "required_for": {TimerStatus.PAUSED},
+        "cleared_value": None,
+    },
+    "total_paused_seconds": {
+        "type": int,
+        "required_for": {TimerStatus.PAUSED},
+        "cleared_value": 0,
+    },
 }
 
 
