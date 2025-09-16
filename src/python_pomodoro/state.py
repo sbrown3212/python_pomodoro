@@ -31,6 +31,7 @@ STATE_SCHEMA = {
             TimerStatus.PAUSED,
             TimerStatus.COMPLETED,
         },
+        "cleared_value": TimerStatus.IDLE,
     },
     "session_type": {
         "type": SessionType,
@@ -82,19 +83,33 @@ class Timer:
     total_paused_seconds: int = 0
 
     def __post_init__(self):
-        if self.status is TimerStatus.IDLE:
-            pass
+        # if self.status is TimerStatus.IDLE:
+        #     pass
+        #
+        # elif self.status is TimerStatus.RUNNING:
+        #     pass
+        #
+        # elif self.status is TimerStatus.PAUSED:
+        #     pass
+        #
+        # else:  # completed
+        #     pass
 
-        elif self.status is TimerStatus.RUNNING:
-            pass
+        for schema_key, value_dict in STATE_SCHEMA.items():
+            if schema_key == "status":
+                continue
 
-        elif self.status is TimerStatus.PAUSED:
-            pass
+            # current_value = getattr(self, schema_key)
 
-        else:  # completed
-            pass
+            # Clear value if not required for current status
+            required_status_set = getattr(value_dict, "required_for")
+            if self.status not in required_status_set:
+                # TODO: update _log_and_clear to use STATE_SCHEMA 'cleared_value'
+                self._log_and_clear(schema_key)
+                continue
 
     def _log_and_clear(self, field_name: str):
+        # TODO: update _log_and_clear to use STATE_SCHEMA 'cleared_value'
         current_value = getattr(self, field_name)
         target_value = 0 if isinstance(current_value, int) else None
 
