@@ -2,7 +2,8 @@ import logging
 import time
 from enum import Enum
 from dataclasses import dataclass
-from pathlib import Path
+
+# from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -20,7 +21,20 @@ class SessionType(Enum):
     BREAK = "break"
 
 
-# Should I make a 'timestamp' type definition?
+class TimeStamp:
+    def __init__(self, value: int):
+        self.value = value
+
+    @classmethod
+    def now(cls):
+        return cls(int(time.time()))
+
+    def __int__(self):
+        return self.value
+
+    def __eq__(self, other):
+        return isinstance(other, TimeStamp) and self.value == other.value
+
 
 STATE_SCHEMA = {
     "status": {
@@ -43,7 +57,7 @@ STATE_SCHEMA = {
         "cleared_value": None,
     },
     "start_time": {
-        "type": int,
+        "type": TimeStamp,
         "required_for": {
             TimerStatus.RUNNING,
             TimerStatus.PAUSED,
@@ -61,7 +75,7 @@ STATE_SCHEMA = {
         "cleared_value": 0,
     },
     "pause_time": {
-        "type": int,
+        "type": TimeStamp,
         "required_for": {TimerStatus.PAUSED},
         "cleared_value": None,
     },
@@ -161,7 +175,9 @@ class Timer:
             raise ValueError(f"{field_name} is required for {self.status.value} state.")
 
     def _clear_field(self, field_name: str):
-        current_value = getattr(self, field_name)
+        # TODO: finish method and implement it in 'post init'.
+        # current_value = getattr(self, field_name)
+        pass
 
 
 def get_state_path():
