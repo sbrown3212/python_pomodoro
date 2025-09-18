@@ -81,8 +81,22 @@ STATE_SCHEMA = {
     },
     "total_paused_seconds": {
         "type": int,
-        "required_for": {TimerStatus.PAUSED},
+        "required_for": {TimerStatus.PAUSED},  # is this required for 'completed'?
         "cleared_value": 0,
+    },
+}
+
+
+REQUIRED_FIELDS = {
+    TimerStatus.IDLE: {},
+    TimerStatus.RUNNING: {"status", "session_type", "start_time", "duration_minutes"},
+    TimerStatus.PAUSED: {
+        "status",
+        "session_type",
+        "start_time",
+        "duration_minutes",
+        "pause_time",
+        "total_paused_seconds",
     },
 }
 
@@ -97,30 +111,57 @@ class Timer:
     total_paused_seconds: int = 0
 
     def __post_init__(self):
-        # if self.status is TimerStatus.IDLE:
-        #     pass
-        #
-        # elif self.status is TimerStatus.RUNNING:
-        #     pass
-        #
-        # elif self.status is TimerStatus.PAUSED:
-        #     pass
-        #
-        # else:  # completed
-        #     pass
+        # QUESTION: Is it better (simpler or more performant) to have a main loop or branching?
+        if self.status is TimerStatus.IDLE:
+            # Clear all values
+            for schema_key in STATE_SCHEMA:
+                self._clear_field(schema_key)
 
-        for schema_key, value_dict in STATE_SCHEMA.items():
-            if schema_key == "status":
-                continue
+            return
 
-            # current_value = getattr(self, schema_key)
+        elif self.status is TimerStatus.RUNNING:
+            # Iterate over schema fields
+            # -- Skip "status" field
+            # -- Require all required fields
+            # -- Validate required values values
+            for schema_key, schema_value in STATE_SCHEMA.items():
+                if schema_key == "status":
+                    continue
 
-            # Clear value if not required for current status
-            required_status_set = getattr(value_dict, "required_for")
-            if self.status not in required_status_set:
-                # TODO: update _log_and_clear to use STATE_SCHEMA 'cleared_value'
-                self._log_and_clear(schema_key)
-                continue
+                if schema_key in REQUIRED_FIELDS[self.status]:
+                    self._require_field(schema_key)
+
+                    field_type = getattr(self, schema_key)
+
+                    if field_type == TimeStamp:
+                        self._validate_timestamp(schema_key)
+                    elif field_type is int:
+                        self._validate_non_negative_int(schema_key, False)
+                    elif field_type == SessionType:
+                        # TODO: implement validation for 'SessionType'???
+                        pass
+
+        elif self.status is TimerStatus.PAUSED:
+            pass
+
+        else:  # completed
+            pass
+
+        # for schema_key, value_dict in STATE_SCHEMA.items():
+        #     if schema_key == "status":
+        #         continue
+        #
+        #     # current_value = getattr(self, schema_key)
+        #
+        #     # Clear value if not required for current status
+        #     required_status_set = getattr(value_dict, "required_for")
+        #     if self.status not in required_status_set:
+        #         # TODO: update _log_and_clear to use STATE_SCHEMA 'cleared_value'
+        #         self._clear_field(schema_key)
+        #         continue
+        #
+        #     # Clear if field is ???
+        #     #
 
     def _log_and_clear(self, field_name: str):
         # TODO: update _log_and_clear to use STATE_SCHEMA 'cleared_value'
@@ -137,6 +178,7 @@ class Timer:
         )
 
     def _validate_timestamp(self, field_name: str):
+        # TODO: update this method to use new 'TimeStamp' class
         timestamp = getattr(self, field_name)
         if timestamp is None:
             return
@@ -153,6 +195,7 @@ class Timer:
             )
 
     def _validate_non_negative_int(self, field_name: str, allow_zero: bool):
+        # TODO: update this method (and method name) to only allow positive (non-zero) nums
         current_int = getattr(self, field_name)
 
         if current_int is None:
@@ -175,9 +218,8 @@ class Timer:
             raise ValueError(f"{field_name} is required for {self.status.value} state.")
 
     def _clear_field(self, field_name: str):
-        # TODO: finish method and implement it in 'post init'.
-        # current_value = getattr(self, field_name)
-        pass
+        target_value = STATE_SCHEMA[field_name]["cleared_value"]
+        setattr(self, field_name, target_value)
 
 
 def get_state_path():
