@@ -221,6 +221,23 @@ class Timer:
         target_value = STATE_SCHEMA[field_name]["cleared_value"]
         setattr(self, field_name, target_value)
 
+    def _validate_field(self, field_name: str):
+        current_value = getattr(self, field_name)
+
+        if not isinstance(current_value, STATE_SCHEMA[field_name]["type"]):
+            raise TypeError(
+                f"{field_name} should be of type {STATE_SCHEMA[field_name]['type']}, but is currently {type(current_value)}."
+            )
+
+        if isinstance(current_value, int):
+            # Ensure int value is positive (should 0 be allowed?
+            # Are 'total_paused_seconds' and 'duration_minutes' going to be checked always?)
+            pass
+
+        elif isinstance(current_value, TimeStamp):
+            # QUESTION: Is here where I should ensure that there are no future timestamps and no timestamps older than 24 hours?
+            pass
+
 
 def get_state_path():
     pass
